@@ -238,12 +238,18 @@ def _save_account(result: Dict[str, Any]):
 
 def test_key(base_url: str, key: str, model: str = None, timeout: int = 90) -> Dict[str, Any]:
     import urllib.request, urllib.error
+    # Header browser lengkap: sebagian gateway (mis. GonkaRouter) dilindungi
+    # Cloudflare dan menolak request urllib polos dengan error 1010.
+    UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+          "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
+    H = {"Authorization": f"Bearer {key}", "User-Agent": UA, "Accept": "application/json"}
     out = {"base_url": base_url, "ok": False}
     try:
-        req = urllib.request.Request(base_url.rstrip("/") + "/models",
-                                     headers={"Authorization": f"Bearer {key}"})
+        req = urllib.request.Request(base_url.rstrip("/") + "/models", headers=H)
         d = json.loads(urllib.request.urlopen(req, timeout=30).read())
-        models = [m.get("id") for m in d.get("data", [])]
+        # Sebagian gateway memakai {"data":[...]} (OpenAI), sebagian {"models":[...]}
+        raw = d.get("data") or d.get("models") or []
+        models = [m.get("id") for m in raw]
         out["models"] = models
         model = model or (models[0] if models else None)
     except Exception as e:
@@ -254,7 +260,7 @@ def test_key(base_url: str, key: str, model: str = None, timeout: int = 90) -> D
         body = json.dumps({"model": model, "messages": [{"role": "user", "content": "Reply exactly: PONG"}],
                            "max_tokens": 16}).encode()
         req = urllib.request.Request(base_url.rstrip("/") + "/chat/completions", data=body,
-                                     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
+                                     headers={**H, "Content-Type": "application/json"})
         with urllib.request.urlopen(req, timeout=timeout) as r:
             d = json.loads(r.read().decode())
         out["ok"] = True

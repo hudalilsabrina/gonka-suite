@@ -41,18 +41,22 @@ GATEWAYS = {
         "captcha": "none",
         "verify": "magic-link",
         "free": "$10 kredit",
-        "notes": "Register 201 -> 'Check your inbox' -> verify link.",
+        "notes": ("Register via POST /api/v1/auth/register -> 201 (pesan netral, "
+                  "anti-enumeration). BLOCKED: email verifikasi tak pernah terkirim "
+                  "(deliverability sisi mereka). Endpoint resend-verification ada."),
     },
     "joingonka": {
         "home": "https://gate.joingonka.ai/",
         "signup_url": "https://gate.joingonka.ai/register",
         "base_url": "https://gate.joingonka.ai/v1",
-        "signup_api": None,
+        "signup_api": "https://gate.joingonka.ai/api/auth/register",
         "key_prefix": "jg-",
-        "captcha": "robot-check",  # 'I'm not a robot' + Cloudflare-ish
+        "captcha": "turnstile",  # Cloudflare Turnstile (render=explicit)
         "verify": "unknown",
         "free": "3M token",
-        "notes": "Ada verifikasi 'I'm not a robot'; kandidat butuh captcha solving.",
+        "notes": ("Cloudflare Turnstile (sitekey 0x4AAAAAADpxBH6c16oc-0u0, render=explicit). "
+                  "Register body: {email,password,referralCode,locale,turnstileToken,visitorId}. "
+                  "Widget tak render di headless/headed (Cloudflare blokir IP datacenter)."),
     },
     "gonka-proxy": {
         "home": "https://proxy.gonka.gg/",
@@ -67,15 +71,18 @@ GATEWAYS = {
         "notes": "TERVERIFIKASI END-TO-END. OTP 6-digit, key via POST /api/keys (field 'key').",
     },
     "gonkarouter": {
-        "home": "https://router.gonkascan.com/",
+        "home": "https://gonkarouter.io/",
         "signup_url": "https://gonkarouter.io/dashboard",
         "base_url": "https://api.gonkarouter.io/v1",
-        "signup_api": None,
+        "signup_api": "https://api.gonkarouter.io/api/keys",  # via email-OTP login
         "key_prefix": "sk-",
-        "captcha": "unknown",
-        "verify": "unknown",
-        "free": "$20 kredit",
-        "notes": "Dashboard guest mode; perlu cari alur signup (mungkin wallet/crypto).",
+        "captcha": "none",
+        "verify": "otp6",   # email OTP -> auto-create account
+        "free": "20 USDT",
+        "notes": ("TERVERIFIKASI E2E. Sign In -> email -> Continue -> OTP 6-digit "
+                  "(auto-create) -> dashboard $20. Key: GET /api/keys lalu "
+                  "POST /api/keys/{id}/reveal (pakai cookie auth_token). "
+                  "API dilindungi Cloudflare (butuh User-Agent browser)."),
     },
     "hyperfusion": {
         "home": "https://console.hyperfusion.io/",
@@ -118,6 +125,23 @@ GATEWAYS = {
         "verify": "fingerprint",  # password = 32-char fingerprint
         "free": "100M token",
         "notes": "Login pakai 32-char fingerprint (bukan email/pw). Free 100M token.",
+    },
+    "freeai": {
+        "home": "https://free.ai/",
+        "signup_url": "https://free.ai/signup/",
+        "base_url": "https://api.free.ai/v1",
+        "signup_api": "https://free.ai/signup/",
+        "key_api": "https://free.ai/api/v1/api-keys/",
+        "key_prefix": "sk-free-",
+        "captcha": "none",
+        "verify": "otp6",   # 6-digit email code
+        "free": "30.000 token/hari",
+        "notes": ("TERVERIFIKASI E2E. Django: POST /signup/ (email+password, hidden "
+                  "signup_token) -> /verify/ kode 6-digit -> 30K token/hari. Key: "
+                  "POST /api/v1/api-keys/ (key penuh hanya di response create; GET "
+                  "hanya prefix). OpenAI-compatible: /v1/chat/completions + /models "
+                  "(511 model, semua self-hosted, gratis dari pool harian). "
+                  "1.000 request/bulan, rate-limit 60/menit."),
     },
 }
 

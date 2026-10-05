@@ -84,6 +84,10 @@ def cmd_harvest_extra(site, n=1):
             r = hx.harvest_dahl()
         elif site in ("gonka-api", "gonka_api"):
             r = hx.harvest_gonka_api()
+        elif site in ("gonkarouter", "gonka-router"):
+            r = asyncio.run(hx.harvest_gonkarouter())
+        elif site in ("freeai", "free-ai", "free.ai"):
+            r = asyncio.run(hx.harvest_freeai())
         else:
             C.print(f"[red]site tidak didukung harvest-extra: {site}[/]"); return
         red = {k: (v if not isinstance(v, str) or len(v) < 20 else v[:8] + "..." + v[-4:])
@@ -101,8 +105,15 @@ async def cmd_pipeline(site, n=1, headless=True):
     for i in range(1, n + 1):
         C.print(f"[cyan]=== Akun {i}/{n} @ {site} ===[/]")
         try:
-            if site in ("dahl", "gonka-api"):
-                r = hx.harvest_dahl() if site == "dahl" else hx.harvest_gonka_api()
+            if site in ("dahl", "gonka-api", "gonkarouter", "freeai"):
+                if site == "dahl":
+                    r = hx.harvest_dahl()
+                elif site == "gonka-api":
+                    r = hx.harvest_gonka_api()
+                elif site == "gonkarouter":
+                    r = await hx.harvest_gonkarouter(headless=headless)
+                else:
+                    r = await hx.harvest_freeai(headless=headless)
                 key, base = r.get("key"), r.get("base_url") or "https://inference.dahl.global/v1"
             else:
                 r = await harvester.harvest(site, headless=headless)
@@ -199,10 +210,16 @@ def cmd_sync(site=None, base=None):
     accounts = _parse_accounts()
     if site:
         # cocokkan keyword ke base_url (mis. 'gonka-proxy'->'proxy.gonka.gg',
-        # 'gonka24'->'gonka24.com'); pakai bagian signifikan
-        key = site.replace("-", "").replace("gonka", "")
+        # 'gonka24'->'gonka24.com', 'freeai'->'free.ai'); normalisasi tanpa
+        # tanda hubung/titik agar variasi penulisan tetap cocok.
+        def _norm(s):
+            return re.sub(r"[^a-z0-9]", "", s.lower())
+        site_n = _norm(site)
+        key = _norm(site.replace("gonka", ""))
         accounts = [a for a in accounts
-                    if site in a["base_url"] or (key and key in a["base_url"])]
+                    if site in a["base_url"]
+                    or (key and key in _norm(a["base_url"]))
+                    or (site_n and site_n in _norm(a["base_url"]))]
     if not accounts:
         C.print("[yellow]Tidak ada akun untuk disync[/]"); return
     # kelompokkan per base_url -> 1 node per gateway
