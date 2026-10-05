@@ -60,6 +60,10 @@ Catatan: `dahl` pakai `username:fingerprint:api_key:base_url`.
 4. **API key** dari response `POST /api/keys` (field `key`/`rawKey`/`token`).
 5. **Test chat** → simpan.
 
+Temp-mail memakai **[tempik](https://github.com/hirotomasato/tempik)** — layanan
+disposable email self-hosted. Kliennya ada di `src/tempmail.py`; set base URL-nya
+lewat `config.toml [api] tempmail_base` atau env `TEMPIK_BASE`.
+
 ### Endpoint kunci per gateway
 - proxy.gonka.gg: `POST /api/auth/register`, `POST /api/keys`
 - gonka24: `POST /api/auth/register` (Firebase), `POST /api/keys`
@@ -82,3 +86,13 @@ Lihat `src/router9.py`. Prefix wajib unik per gateway (dibuat dari slug host).
 - **reCAPTCHA Enterprise** (gonka-broker, hyperfusion) memblokir signup headless.
 - **gonka-api `agent-signup`** adalah jalur resmi untuk agen — tanpa email/captcha.
 - Jangan commit `accounts.txt` / `data/` (berisi kredensial).
+
+## Credits
+
+- **[tempik](https://github.com/hirotomasato/tempik)** — self-hosted disposable
+  temp-mail service. Endpoint klien (`/api/session`, `/api/inboxes`,
+  `/api/inboxes/{addr}/messages`) yang dipakai `src/tempmail.py` mengikuti API
+  tempik. Terima kasih kepada penulisnya.
+- Slider captcha solver di `src/captcha.py` di-port dari `captcha-solver.js`
+  (algoritma alpha NCC + Canny edges + Sobel gap detection).
+- Model diakses lewat gateway OpenAI-compatible ke jaringan Gonka.

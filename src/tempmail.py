@@ -1,6 +1,7 @@
 """
 Gonka Suite - Tempik API Client
-Self-hosted temp mail service: https://github.com/hirotomasato/tempik
+Disposable temp-mail client. API mengikuti tempik:
+https://github.com/hirotomasato/tempik
 
 Endpoints:
   GET  /api/session               → { sessionId }
@@ -151,7 +152,7 @@ class TempikClient:
     def extract_otp(self, messages: List[Dict[str, Any]]) -> Optional[str]:
         """Extract verification code from messages.
 
-        Gateway sends HTML email with the code as a standalone 6-digit number
+        Qoder sends HTML email with the code as a standalone 6-digit number
         after "Verify your email" text. We strip HTML tags first, then search
         for the code in the plain text.
         """
@@ -167,9 +168,9 @@ class TempikClient:
             write_log(f"OTP plain text: {content[:300]}", "INFO")
 
             patterns = [
-                # Generic: "verify your email" followed by a standalone 6-digit code
+                # Qoder specific: "Verify your email" OR "start using Qoder"
                 # followed by a standalone 6-digit code
-                r"(?:verify\s+your\s+email|verify\s+email)[\s\S]*?(\d{6})",
+                r"(?:verify\s+your\s+email|start\s+using\s+Qoder)[\s\S]*?(\d{6})",
                 # Generic fallback: standalone 6-digit code
                 r"\b(\d{6})\b",
                 # Other formats
