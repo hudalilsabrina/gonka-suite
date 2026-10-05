@@ -45,6 +45,18 @@ python3 -m venv .venv
 ./run.sh sync [site]             # inject akun ke 9router (OpenAI-compatible node)
 ```
 
+### Batch runner (multi-gateway)
+
+```bash
+.venv/bin/python batch.py <site> <n>   # N akun dari satu gateway, log ke data/batch_<site>.jsonl
+.venv/bin/python batch.py --auto <n>   # N akun, auto-fallback antar-gateway saat kena rate-limit
+```
+
+`--auto` mendeteksi pesan rate-limit dan otomatis pindah ke gateway berikutnya
+(urutan `AUTO_ORDER`), dengan cooldown per-gateway. Setiap key diverifikasi chat
+sebelum dicatat. Gateway yang punya batas per-IP (mis. free.ai ~5/jam) akan
+di-cooldown, sementara gateway tanpa batas (mis. gonkarouter) terus dipakai.
+
 ## Format akun (`accounts.txt`)
 
 ```
