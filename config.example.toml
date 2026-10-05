@@ -1,0 +1,16 @@
+# Gonka Suite - example config. Copy to config.toml and fill in your values.
+
+[api]
+# Self-hosted disposable temp-mail API base (no trailing slash).
+tempmail_base = "http://localhost:8080/api"
+
+[router]
+# 9router local endpoint (used by `sync`).
+url = "http://localhost:20127"
+password = ""
+
+[general]
+headless = true
+
+# [notify]
+# webhook_url = ""

@@ -1,0 +1,5 @@
+.venv/
+__pycache__/
+accounts.txt
+data/
+*.log
