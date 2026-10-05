@@ -16,7 +16,6 @@ Suite ini: buat akun → verifikasi → ambil API key → test chat → inject k
 | `dahl` | `inference.dahl.global/v1` | none | username-only | 100M token | ✅ E2E |
 | `gonka-api` | `.../functions/v1/gonka` | none | agent-signup | $0.05 (~2.5M) | ✅ E2E |
 | `gonkarouter` | `api.gonkarouter.io/v1` | none | email OTP | 20 USDT | ✅ E2E |
-| `freeai` | `api.free.ai/v1` | none | OTP 6-digit | 30K token/hari | ✅ E2E |
 | `gonkagate` | `api.gonkagate.com/v1` | none | magic-link | $10 | ⏳ register 201, email blocked |
 | `joingonka` | `gate.joingonka.ai/v1` | Turnstile | ? | 3M | 🔴 Cloudflare |
 | `gonka-broker` | `proxy.gonkabroker.com/v1` | reCAPTCHA Ent. | ? | 1M/bln | 🔴 403 |
@@ -54,8 +53,8 @@ python3 -m venv .venv
 
 `--auto` mendeteksi pesan rate-limit dan otomatis pindah ke gateway berikutnya
 (urutan `AUTO_ORDER`), dengan cooldown per-gateway. Setiap key diverifikasi chat
-sebelum dicatat. Gateway yang punya batas per-IP (mis. free.ai ~5/jam) akan
-di-cooldown, sementara gateway tanpa batas (mis. gonkarouter) terus dipakai.
+sebelum dicatat. Gateway yang punya batas per-IP akan di-cooldown, sementara
+gateway tanpa batas (mis. gonkarouter) terus dipakai.
 
 ## Format akun (`accounts.txt`)
 
@@ -84,7 +83,6 @@ lewat `config.toml [api] tempmail_base` atau env `TEMPIK_BASE`.
 - dahl: `POST /v1/auth/signup` → fingerprint + key; `POST /v1/account/allocate` (100M)
 - gonka-api: `POST /functions/v1/agent-signup` (1 request = akun + token, tanpa email)
 - gonkarouter: email-OTP login (auto-create) → `GET /api/keys` → `POST /api/keys/{id}/reveal`
-- freeai: `POST /signup/` (Django) → `/verify/` kode 6-digit → `POST /api/v1/api-keys/` (key penuh hanya saat create)
 - gonkagate: `POST /api/v1/auth/register` → 201; `POST /api/v1/auth/resend-verification`
 
 ## Harvester alur khusus (`harvest-extra`)
@@ -96,13 +94,11 @@ Beberapa gateway tidak memakai form signup standar:
 | `dahl` | username-only → fingerprint + key → allocate 100M |
 | `gonka-api` | `POST /agent-signup` (1 request, tanpa email/captcha) |
 | `gonkarouter` | email → OTP 6-digit (auto-create) → reveal key |
-| `freeai` | email+password → kode 6-digit → 30K token/hari → generate key |
 
 ```bash
 ./run.sh harvest-extra dahl -n 1
 ./run.sh harvest-extra gonka-api -n 1
 ./run.sh harvest-extra gonkarouter -n 1
-./run.sh harvest-extra freeai -n 1
 ```
 
 ## Integrasi 9router

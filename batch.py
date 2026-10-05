@@ -29,7 +29,7 @@ DATA = Path(__file__).resolve().parent / "data"
 DATA.mkdir(exist_ok=True)
 
 # Gateway yang bisa di-batch (terurut prioritas) untuk mode --auto.
-AUTO_ORDER = ["gonkarouter", "gonka-proxy", "freeai"]
+AUTO_ORDER = ["gonkarouter", "gonka-proxy"]
 
 # Sinyal rate-limit (lowercase) di pesan error -> gateway di-cooldown.
 RATE_HINTS = ["too many", "rate limit", "rate_limit", "try again", "429",
@@ -37,8 +37,6 @@ RATE_HINTS = ["too many", "rate limit", "rate_limit", "try again", "429",
 
 
 async def _run(site, headless):
-    if site == "freeai":
-        return await hx.harvest_freeai(headless=headless)
     if site == "gonkarouter":
         return await hx.harvest_gonkarouter(headless=headless)
     if site == "dahl":

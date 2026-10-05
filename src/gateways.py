@@ -126,23 +126,6 @@ GATEWAYS = {
         "free": "100M token",
         "notes": "Login pakai 32-char fingerprint (bukan email/pw). Free 100M token.",
     },
-    "freeai": {
-        "home": "https://free.ai/",
-        "signup_url": "https://free.ai/signup/",
-        "base_url": "https://api.free.ai/v1",
-        "signup_api": "https://free.ai/signup/",
-        "key_api": "https://free.ai/api/v1/api-keys/",
-        "key_prefix": "sk-free-",
-        "captcha": "none",
-        "verify": "otp6",   # 6-digit email code
-        "free": "30.000 token/hari",
-        "notes": ("TERVERIFIKASI E2E. Django: POST /signup/ (email+password, hidden "
-                  "signup_token) -> /verify/ kode 6-digit -> 30K token/hari. Key: "
-                  "POST /api/v1/api-keys/ (key penuh hanya di response create; GET "
-                  "hanya prefix). OpenAI-compatible: /v1/chat/completions + /models "
-                  "(511 model, semua self-hosted, gratis dari pool harian). "
-                  "1.000 request/bulan, rate-limit 60/menit."),
-    },
 }
 
 

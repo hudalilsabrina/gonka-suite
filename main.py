@@ -86,8 +86,6 @@ def cmd_harvest_extra(site, n=1):
             r = hx.harvest_gonka_api()
         elif site in ("gonkarouter", "gonka-router"):
             r = asyncio.run(hx.harvest_gonkarouter())
-        elif site in ("freeai", "free-ai", "free.ai"):
-            r = asyncio.run(hx.harvest_freeai())
         else:
             C.print(f"[red]site tidak didukung harvest-extra: {site}[/]"); return
         red = {k: (v if not isinstance(v, str) or len(v) < 20 else v[:8] + "..." + v[-4:])
@@ -105,15 +103,13 @@ async def cmd_pipeline(site, n=1, headless=True):
     for i in range(1, n + 1):
         C.print(f"[cyan]=== Akun {i}/{n} @ {site} ===[/]")
         try:
-            if site in ("dahl", "gonka-api", "gonkarouter", "freeai"):
+            if site in ("dahl", "gonka-api", "gonkarouter"):
                 if site == "dahl":
                     r = hx.harvest_dahl()
                 elif site == "gonka-api":
                     r = hx.harvest_gonka_api()
-                elif site == "gonkarouter":
-                    r = await hx.harvest_gonkarouter(headless=headless)
                 else:
-                    r = await hx.harvest_freeai(headless=headless)
+                    r = await hx.harvest_gonkarouter(headless=headless)
                 key, base = r.get("key"), r.get("base_url") or "https://inference.dahl.global/v1"
             else:
                 r = await harvester.harvest(site, headless=headless)
