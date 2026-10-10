@@ -3,3 +3,4 @@ __pycache__/
 accounts.txt
 data/
 *.log
+config.toml
