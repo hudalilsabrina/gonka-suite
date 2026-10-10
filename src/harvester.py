@@ -11,6 +11,7 @@ Karena halaman memakai React, pengetikan dilakukan via Playwright (real typing),
 bukan set value manual.
 """
 
+import os
 import asyncio
 import json
 import re
@@ -95,7 +96,7 @@ def _read_link(site: str, keywords=("verify", "confirm", "token", "activate", "a
     return None
 
 
-async def harvest(site: str, headless: bool = True, password: str = "Gonka#2026xY",
+async def harvest(site: str, headless: bool = True, password: str = os.getenv("GONKA_SUITE_PASSWORD", "change-me-Gonka1!"),
                   timeout_verify: int = 150) -> Dict[str, Any]:
     """Jalankan alur harvest lengkap untuk satu gateway. Return dict hasil."""
     from playwright.async_api import async_playwright
